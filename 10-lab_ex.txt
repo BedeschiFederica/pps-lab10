@@ -1,0 +1,206 @@
+% Ex1.3
+
+% search_two(Elem, List)
+% looks for two occurrences of Elem with any element in between!
+search_two(X, cons(X, cons(_, cons(X, _)))).
+search_two(X, cons(_, Xs)) :- search_two(X, Xs).
+
+%-----------------------------------------------------------------
+
+% Ex1.4
+
+% search_anytwo(Elem, List)
+% looks for any Elem that occurs two times, anywhere
+search_anytwo(X, cons(X, Xs)) :- search(X, Xs).
+search_anytwo(X, cons(Y, Xs)) :- X \= Y, search_anytwo(X, Xs).
+
+% search(Elem, List)
+search(X, cons(X, _)).
+search(X, cons(_, Xs)) :- search(X, Xs).
+
+%-----------------------------------------------------------------
+
+% Ex2.1
+
+% size(List,Size)
+% Size will contain the number of elements in List, written using notation zero, s(zero), s(s(zero))..
+size(nil, zero).
+size(cons(_, Xs), s(Res)) :- size(Xs, Res).
+
+%-----------------------------------------------------------------
+
+% Ex2.2
+
+% sum_list(List, Sum)
+sum_list(nil, zero).
+sum_list(cons(X, Xs), Res) :- sum_list(Xs, R), sum(R, X, Res).
+
+sum(X, zero, X).
+sum(A, s(B), s(C)) :- sum(A, B, C).
+
+%-----------------------------------------------------------------
+
+% Ex2.4
+
+% max(List, Max)
+% Max is the biggest element in List
+% Suppose the list has at least one element
+max(cons(E, L), M) :- max(L, E, M).
+max(nil, T, T).
+max(cons(E, L), T, M) :- greater(E, T), max(L, E, M).
+max(cons(E, L), T, M) :- greater(T, E), max(L, T, M).
+max(cons(T, L), T, M) :- max(L, T, M).
+
+greater(s(_), zero).
+greater(s(N), s(M)) :- greater(N, M).
+
+%-----------------------------------------------------------------
+
+% Ex2.5
+
+% min-max(List,Min,Max)
+% Min is the smallest element in List
+% Max is the biggest element in List
+% Suppose the list has at least one element
+min-max(cons(E, L), Min, Max) :- min-max(L, E, E, Min, Max).
+min-max(nil, TMin, TMax, TMin, TMax).
+min-max(cons(E, L), TMin, TMax, Min, Max) :- greater(E, TMax), min-max(L, TMin, E, Min, Max).
+min-max(cons(E, L), TMin, TMax, Min, Max) :- greater(TMin, E), min-max(L, E, TMax, Min, Max).
+min-max(cons(E, L), TMin, TMax, Min, Max) :- geq(TMax, E), geq(E, TMin), min-max(L, TMin, TMax, Min, Max).
+
+geq(zero, zero).
+geq(s(_), zero).
+geq(s(N), s(M)) :- geq(N, M).
+
+%-----------------------------------------------------------------
+
+% Ex3.1
+
+% same(List1,List2)
+% are the two lists exactly the same?
+same(nil, nil).
+same(cons(H, T), cons(H, T)).
+
+%-----------------------------------------------------------------
+
+% Ex3.2
+
+% all_bigger(List1,List2)
+% all elements in List1 are bigger than those in List2, 1 by 1
+all_bigger(cons(H1, nil), cons(H2, nil)) :- greater(H1, H2).
+all_bigger(cons(H1, T1), cons(H2, T2)) :- greater(H1, H2), all_bigger(T1, T2).
+
+%-----------------------------------------------------------------
+
+% Ex3.3
+
+% sublist(List1,List2)
+% List1 should contain elements all also in List2
+sublist(nil, _).
+sublist(cons(H1, T1), L2) :- search(H1, L2), sublist(T1, L2).
+
+%-----------------------------------------------------------------
+
+% Ex4.2
+
+% seqR(N,List)
+seqR(zero, nil).
+seqR(s(N), cons(N, T)) :- seqR(N, T).
+
+%-----------------------------------------------------------------
+
+% Ex4.3
+
+% seqR2(N,List) --> is [0,1,...,N-1]
+seqR2(zero, nil).
+seqR2(s(N), Res) :- seqR2(N, R), last(R, N, Res).
+
+last(nil, E, cons(E, nil)).
+last(cons(H, T), E, cons(H, R)) :- last(T, E, R).
+
+%-----------------------------------------------------------------
+
+% Ex5
+
+% getLast(List, Elem)
+% Elem is the last element of List
+% example:	getLast(cons(a, cons(b, cons(c, nil))), c).
+getLast(cons(E, nil), E).
+getLast(cons(_, T), R) :- getLast(T, R).
+
+% mapSucc(List, ListRes)
+% ListRes is the list in which each element is the successor of the corresponding element of List
+% example:	mapSucc(cons(s(s(zero)), cons(zero, nil)), cons(s(s(s(zero))), cons(s(zero), nil))).
+mapSucc(nil, nil).
+mapSucc(cons(N, T), cons(s(N), R)) :- mapSucc(T, R).
+
+% filter(List, Value, ListRes)
+% ListRes is the list of all elements of List that are greater than Value
+% example:	filter(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), cons(s(s(zero)),cons(s(s(s(zero))),nil))).
+filter(nil, _, nil).
+filter(cons(N, T), V, cons(N, R)) :- greater(N, V), filter(T, V, R).
+filter(cons(N, T), V, R) :- geq(V, N), filter(T, V, R).
+
+% count(List, Value, Count)
+% Count is the count of elements in List that are greater than Value
+% example:	count(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), s(s(zero))).
+count(nil, _, zero).
+count(cons(N, T), V, s(C)) :- greater(N, V), count(T, V, C).
+count(cons(N, T), V, C) :- geq(V, N), count(T, V, C).
+
+% find(List, Value, Elem)
+% Elem is an element of List that is greater than Value.
+% examples:	find(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), s(s(zero))).
+%						find(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), s(s(s(zero)))).
+%						find(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), E). -> stream of solutions
+find(cons(N, _), V, N) :- greater(N, V).
+find(cons(_, T), V, R) :- find(T, V, R).
+
+% dropRight(List, Num, ListRes)
+% ListRest contains all the elements of List except the last Num elements.
+% example:	dropRight(cons(a, cons(b, cons(c, nil))), s(s(zero)), cons(a, nil)).
+dropRight(L, zero, L).
+dropRight(cons(H, T), s(N), cons(H, R)) :- count(T, C), geq(C, s(N)), dropRight(T, s(N), R).
+dropRight(cons(_, T), s(N), R) :- count(T, C), greater(s(N), C), dropRight(T, N, R).
+count(nil, zero).
+count(cons(_, T), s(N)) :- count(T, N).
+
+% dropWhile(List, Value, ListRes)
+% ListRes contains the elements of List, skipping those from the beginning as long as they are greater than Value.
+% example:	dropWhile(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), cons(s(zero), cons(s(s(s(zero))), nil))).
+dropWhile(nil, _, nil).
+dropWhile(cons(N, T), V, R) :- greater(N, V), dropWhile(T, V, R).
+dropWhile(cons(N, T), V, cons(N, T)) :- geq(V, N).
+
+% partition(List, Value, Part1, Part2)
+% Part1 contains the elements of List than are greater than Value, Part2 the others.
+% example:	partition(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero),
+%											cons(s(s(zero)),cons(s(s(s(zero))),nil)), cons(s(zero),nil)).
+partition(nil, _, nil, nil).
+partition(cons(N, T), V, cons(N, T1), P2) :- greater(N, V), partition(T, V, T1, P2).
+partition(cons(N, T), V, P1, cons(N, T2)) :- geq(V, N), partition(T, V, P1, T2).
+
+% reversed(List, ListRev)
+% ListRev contains the elements of List in reverse order.
+% example:	reversed(cons(a, cons(b, cons(c, nil))), cons(c, cons(b, cons(a, nil)))).
+reversed(nil, nil).
+reversed(cons(H, T), Rev) :- reversed(T, R), last(R, H, Rev).
+
+% drop(List, Num, ListRes)
+% ListRest contains all the elements of List except the first Num elements.
+% example:	drop(cons(a, cons(b, cons(c, nil))), s(s(zero)), cons(c, nil)).
+drop(L, zero, L).
+drop(cons(_, T), s(N), R) :- drop(T, N, R).
+
+% take(List, Num, ListRes)
+% ListRest contains the first Num of elements of List.
+% example:	take(cons(a, cons(b, cons(c, nil))), s(s(zero)), cons(a, cons(b, nil))).
+take(_, zero, nil).
+take(cons(H, T), s(N), cons(H, R)) :- take(T, N, R).
+
+% zip(List1, List2, ListRes)
+% ListRes contains the elements of List1 and List2 paired one by one.
+% example:	zip(cons(a, cons(b, nil)), cons(x, cons(y, nil)), cons((a, x), cons((b, y), nil))).
+zip(_, nil, nil).
+zip(nil, _, nil).
+zip(cons(H1, T1), cons(H2, T2), cons((H1, H2), R)) :- zip(T1, T2, R).
