@@ -151,8 +151,8 @@ count(cons(N, T), V, C) :- geq(V, N), count(T, V, C).
 % find(List, Value, Elem)
 % Elem is an element of List that is greater than Value.
 % examples:	find(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), s(s(zero))).
-%						find(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), s(s(s(zero)))).
-%						find(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), E). -> stream of solutions
+%		find(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), s(s(s(zero)))).
+%		find(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero), E). -> stream of solutions
 find(cons(N, _), V, N) :- greater(N, V).
 find(cons(_, T), V, R) :- find(T, V, R).
 
@@ -175,7 +175,7 @@ dropWhile(cons(N, T), V, cons(N, T)) :- geq(V, N).
 % partition(List, Value, Part1, Part2)
 % Part1 contains the elements of List than are greater than Value, Part2 the others.
 % example:	partition(cons(s(s(zero)), cons(s(zero), cons(s(s(s(zero))), nil))), s(zero),
-%											cons(s(s(zero)),cons(s(s(s(zero))),nil)), cons(s(zero),nil)).
+%		          cons(s(s(zero)),cons(s(s(s(zero))),nil)), cons(s(zero),nil)).
 partition(nil, _, nil, nil).
 partition(cons(N, T), V, cons(N, T1), P2) :- greater(N, V), partition(T, V, T1, P2).
 partition(cons(N, T), V, P1, cons(N, T2)) :- geq(V, N), partition(T, V, P1, T2).
